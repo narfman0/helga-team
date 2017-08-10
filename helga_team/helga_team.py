@@ -74,7 +74,7 @@ def parse(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--id')
     parser.add_argument('-n', '--name')
-    parser.add_argument('-s', '--status', default='pending')
+    parser.add_argument('-s', '--status')
     parser.add_argument('-o', '--owner')
     parser.add_argument('-r', '--recruiter')
     parser.add_argument('-c', '--code_review')
