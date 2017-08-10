@@ -7,6 +7,10 @@ from helga.db import db
 from helga.plugins import command, match, random_ack, ResponseNotReady
 
 
+HELP_TEXT = """Team plugin to track candidates and interview process.
+Refer to https://github.com/narfman0/helga-team#usage for more info."""
+
+
 def handle_add(client, channel, parser, nick):
     set_args = parser_to_dict(parser)
     # generate some defaults
@@ -14,8 +18,6 @@ def handle_add(client, channel, parser, nick):
         set_args['id'] = generate_id()
     if 'status' not in set_args:
         set_args['status'] = 'pending'
-    if 'owner' not in set_args:
-        set_args['owner'] = nick
     set_args['last_update'] = str(datetime.now())
     db.team.candidates.insert(set_args)
     return random_ack()
@@ -23,9 +25,10 @@ def handle_add(client, channel, parser, nick):
 
 def handle_update(client, channel, parser, nick):
     get_args = {}
+    # if id is passed, use id. name is a fallback.
     if parser.id:
         get_args['id'] = parser.id
-    if parser.name:
+    elif parser.name:
         get_args['name'] = parser.name
     set_args = parser_to_dict(parser)
     set_args['last_update'] = str(datetime.now())
@@ -61,9 +64,9 @@ def logic(client, channel, command, parser, nick):
     return 'Team command unknown: ' + command
 
 
-@command('team', help='Team plugin to track candidates and interview process', shlex=True)
+@command('team', help=HELP_TEXT, shlex=True)
 def team(client, channel, nick, message, cmd, args):
-    return logic(client, channel, args[0], parse(args), nick)
+    return logic(client, channel, args[0], parse(args[1:]), nick)
 
 
 def parse(args):
@@ -87,6 +90,8 @@ def status(candidate):
         response += ', recruiter: ' + candidate['recruiter']
     if 'status' in candidate:
         response += ', status: ' + candidate['status']
+    if 'code_review' in candidate:
+        response += ', code_review: ' + candidate['code_review']
     return response + ', id: ' + candidate['id']
 
 

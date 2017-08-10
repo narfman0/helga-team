@@ -43,6 +43,15 @@ requesting status::
     helga> "Calvin Candidaton, owner: Eric Employerson, recruiter: Roger
     Recruitenbridge, status: Phone Screen 1/1, id: 1"
 
+Update only updates a single candidate. Status can return many candidates,
+using the arguments as filters. e.g.::
+
+    !team add -i 1 -n "Calvin Candidaton" -o "Jon R"
+    !team add -i 1 -n "Roger Recruitenbridge" -o "Jon R"
+    !team status -o "Jon R"
+    helga> Calvin Candidaton...
+    helga> Roger Recruitenbridge...
+
 TODO
 ----
 
