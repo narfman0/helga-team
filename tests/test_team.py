@@ -19,9 +19,10 @@ class TestTeam(unittest.TestCase):
         )
         self.db_patch.start()
         self.addCleanup(self.db_patch.stop)
+        db.team.candidates.drop()
 
     def tearDown(self):
-        db.team.drop()
+        db.team.candidates.drop()
 
     def test_parse(self):
         parser = parse(("-i", "id1", "-n" "A B", "-r", "Steve"))
@@ -38,20 +39,25 @@ class TestTeam(unittest.TestCase):
         parser_mock.recruiter = None
         parser_mock.owner = None
         parser_mock.status = None
-        parser_mock.id = None
+        parser_mock.id = 1
         parser_mock.recruiter = None
         parser_mock.code_review = None
         owner = 'Nick1'
+        # verify insertion
         handle_add(None, None, parser_mock, owner)
-        candidate = db.team.find_one({"name": first_name})
+        candidate = db.team.candidates.find_one({"name": first_name})
         self.assertEqual(first_name, candidate['name'])
+        candidate = db.team.candidates.find_one({"id": parser_mock.id})
+        self.assertEqual(first_name, candidate['name'])
+        # update name
         parser_mock.name = second_name
         handle_update(None, None, parser_mock, owner)
-        candidate = db.team.find_one({"name": second_name})
+        candidate = db.team.candidates.find_one({"name": second_name})
         self.assertEqual(second_name, candidate['name'])
+        # verify removal
         handle_remove(None, None, parser_mock, owner)
         try:
-            candidate = db.team.find_one({"name": second_name})
+            candidate = db.team.candidates.find_one({"name": second_name})
             if candidate != None:
                 raise Exception("Candidate should be None here!")
         except:
